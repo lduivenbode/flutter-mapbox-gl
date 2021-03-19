@@ -59,12 +59,15 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
       }
 
       if let heading = userLocation?.heading?.trueHeading {
+        arrowLayer.isHidden = false
         let newArrowRotation = -MGLRadiansFromDegrees(mv.direction - heading)
         let newArrowScale = max(1.0, (arrowMeters / mpp) / minArrowSize)
 
         if newArrowScale != arrowScale || newArrowRotation != arrowRotation {
           layoutArrowLayer(newArrowScale: newArrowScale, newArrowRotation: newArrowRotation)
         }
+      } else {
+        arrowLayer.isHidden = true
       }
     }
   }
