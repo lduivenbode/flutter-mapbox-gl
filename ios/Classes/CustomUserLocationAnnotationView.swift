@@ -4,24 +4,23 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
   let minDotSize: CGFloat = 24
   let minDotMeters: CGFloat = 8
   let maxDotSize: CGFloat
-  var dotSize: CGFloat
+  var dotSize: CGFloat = 0.0
+  var dotOpacity: Float = 0.0
 
   let arrowMeters: CGFloat = 6
-  let minArrowSize: CGFloat = 12
+  let minArrowSize: CGFloat = 14
   let smallHitTestLayer: CALayer
   var arrowRotation: CGFloat?
-  var arrowScale: CGFloat
+  var arrowScale: CGFloat = 1.0
 
   let dotLayer: CALayer
   let arrowLayer: CAShapeLayer
 
-  let lineWidth: CGFloat = 2
+  let dotLineWidth: CGFloat = 2
 
   init() {
     let size: CGFloat = 200
-    dotSize = 0.0
-    maxDotSize = size - lineWidth
-    arrowScale = 1.0
+    maxDotSize = size - dotLineWidth
     smallHitTestLayer = CALayer()
     let hitTestOffset = size / 2 - minDotSize / 2
     smallHitTestLayer.frame = CGRect(x: hitTestOffset, y: hitTestOffset, width: minDotSize, height: minDotSize)
@@ -36,6 +35,7 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
 
     arrowLayer.path = getArrowPath()
     arrowLayer.fillColor = dotLayer.borderColor
+    arrowLayer.lineWidth = 0.75
     layer.addSublayer(arrowLayer)
   }
 
@@ -54,8 +54,9 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
       let dotMetersSize = minDotMeters / mpp
       let newDotSize = min(maxDotSize, max(dotMetersSize, max(minDotSize, accuracySize)))
 
-      if newDotSize != dotSize {
-        layoutDotLayer(newDotSize: newDotSize)
+      let newDotOpacity = Float(max(0.0, min(1.0, 0.1 + (maxDotSize - accuracySize) / maxDotSize)))
+      if newDotSize != dotSize || newDotOpacity != dotOpacity {
+        layoutDotLayer(newDotSize: newDotSize, opacity: newDotOpacity)
       }
 
       if let heading = userLocation?.heading?.trueHeading {
@@ -72,17 +73,20 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
     }
   }
 
-  private func layoutDotLayer(newDotSize: CGFloat) {
+  private func layoutDotLayer(newDotSize: CGFloat, opacity: Float) {
     CATransaction.begin()
-    CATransaction.setDisableActions(abs(newDotSize - dotSize) < 4)
+    CATransaction.setDisableActions(abs(newDotSize - dotSize) < 16)
 
     dotSize = newDotSize
+    dotOpacity = opacity
     let dotOffset = frame.size.width / 2.0 - dotSize / 2.0
     dotLayer.backgroundColor = tintColor.cgColor
+    arrowLayer.strokeColor = dotLayer.backgroundColor
+
     dotLayer.frame = CGRect(x: dotOffset, y: dotOffset, width: dotSize, height: dotSize)
     dotLayer.cornerRadius = dotSize / 2
     dotLayer.borderWidth = dotSize / 14
-    dotLayer.opacity = Float(min(1.0, 0.1 + (maxDotSize - dotSize) / maxDotSize))
+    dotLayer.opacity = opacity
 
     CATransaction.commit()
   }
