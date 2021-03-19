@@ -79,7 +79,7 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
     dotLayer.frame = CGRect(x: dotOffset, y: dotOffset, width: dotSize, height: dotSize)
     dotLayer.cornerRadius = dotSize / 2
     dotLayer.borderWidth = dotSize / 14
-    dotLayer.opacity = Float(min(1.0, 0.2 + (maxDotSize - dotSize) / maxDotSize))
+    dotLayer.opacity = Float(min(1.0, 0.1 + (maxDotSize - dotSize) / maxDotSize))
 
     CATransaction.commit()
   }
