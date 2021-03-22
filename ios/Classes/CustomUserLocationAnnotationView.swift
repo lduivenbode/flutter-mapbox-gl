@@ -37,6 +37,15 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
     arrowLayer.fillColor = dotLayer.borderColor
     arrowLayer.lineWidth = 0.75
     layer.addSublayer(arrowLayer)
+
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(onTap(_:)))
+    addGestureRecognizer(tapGesture)
+  }
+
+  @objc func onTap(_ gesture: UIGestureRecognizer) {
+    if gesture.state == .ended, smallHitTestLayer.hitTest(gesture.location(in: self)) != nil {
+      mapView?.setUserTrackingMode(MGLUserTrackingMode.followWithHeading, animated: true, completionHandler: nil)
+    }
   }
 
   override var hitTestLayer: CALayer? {
