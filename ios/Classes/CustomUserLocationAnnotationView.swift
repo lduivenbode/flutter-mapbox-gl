@@ -22,8 +22,8 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
     let size: CGFloat = 200
     maxDotSize = size - dotLineWidth
     smallHitTestLayer = CALayer()
-    let hitTestOffset = size / 2 - minDotSize / 2
-    smallHitTestLayer.frame = CGRect(x: hitTestOffset, y: hitTestOffset, width: minDotSize, height: minDotSize)
+    let hitTestOffset = size / 2 - minDotSize
+    smallHitTestLayer.frame = CGRect(x: hitTestOffset, y: hitTestOffset, width: minDotSize * 2, height: minDotSize * 2)
     dotLayer = CALayer()
     arrowLayer = CAShapeLayer()
 
@@ -43,8 +43,15 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
   }
 
   @objc func onTap(_ gesture: UIGestureRecognizer) {
-    if gesture.state == .ended, smallHitTestLayer.hitTest(gesture.location(in: self)) != nil {
-      mapView?.setUserTrackingMode(MGLUserTrackingMode.followWithHeading, animated: true, completionHandler: nil)
+    if gesture.state == .ended,
+       smallHitTestLayer.hitTest(gesture.location(in: self)) != nil,
+       let heading = userLocation?.heading?.trueHeading,
+       let camera = mapView?.camera
+    {
+      camera.heading = heading
+      mapView?.setCamera(camera, withDuration: 0.3, animationTimingFunction: nil, edgePadding: UIEdgeInsets.zero, completionHandler: {
+        self.mapView?.setUserTrackingMode(MGLUserTrackingMode.followWithHeading, animated: true, completionHandler: nil)
+      })
     }
   }
 
