@@ -42,16 +42,24 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
     addGestureRecognizer(tapGesture)
   }
 
+  /// When tapped, toggle follow/followWithHeading tracking mode
   @objc func onTap(_ gesture: UIGestureRecognizer) {
     if gesture.state == .ended,
        smallHitTestLayer.hitTest(gesture.location(in: self)) != nil,
        let heading = userLocation?.heading?.trueHeading,
-       let camera = mapView?.camera
+       let camera = mapView?.camera,
+       let mv = mapView
     {
-      camera.heading = heading
-      mapView?.setCamera(camera, withDuration: 0.3, animationTimingFunction: nil, edgePadding: UIEdgeInsets.zero, completionHandler: {
-        self.mapView?.setUserTrackingMode(MGLUserTrackingMode.followWithHeading, animated: true, completionHandler: nil)
-      })
+      if mv.userTrackingMode != .followWithHeading {
+        camera.heading = heading
+        mv.setCamera(camera, withDuration: 0.3, animationTimingFunction: nil, edgePadding: UIEdgeInsets.zero, completionHandler: {
+          mv.setUserTrackingMode(MGLUserTrackingMode.followWithHeading, animated: true, completionHandler: nil)
+        })
+      } else {
+        mv.setUserTrackingMode(MGLUserTrackingMode.follow, animated: false, completionHandler:  {
+          mv.setDirection(0.0, animated: true)
+        })
+      }
     }
   }
 
