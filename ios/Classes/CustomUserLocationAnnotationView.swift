@@ -31,6 +31,12 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
     isOpaque = false
 
     dotLayer.borderColor = UIColor.white.cgColor
+
+    dotLayer.shadowOffset = CGSize(width: 4, height: 4)
+    dotLayer.shadowRadius = 4
+    dotLayer.shadowColor = UIColor(hexString: "#685900")?.cgColor
+    dotLayer.shadowOpacity = 0.25
+
     layer.addSublayer(dotLayer)
 
     arrowLayer.path = getArrowPath()
@@ -105,7 +111,6 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
     dotOpacity = opacity
     let dotOffset = frame.size.width / 2.0 - dotSize / 2.0
     dotLayer.backgroundColor = tintColor.cgColor
-    arrowLayer.strokeColor = dotLayer.backgroundColor
 
     dotLayer.frame = CGRect(x: dotOffset, y: dotOffset, width: dotSize, height: dotSize)
     dotLayer.cornerRadius = dotSize / 2
@@ -121,6 +126,7 @@ class CustomUserLocationAnnotationView: MGLUserLocationAnnotationView {
     arrowScale = newArrowScale
     arrowRotation = newArrowRotation
 
+    arrowLayer.strokeColor = tintColor.cgColor
     arrowLayer.setAffineTransform(CGAffineTransform(scaleX: arrowScale, y: arrowScale).concatenating(CGAffineTransform.identity.translatedBy(x: bounds.width / 2, y: bounds.height / 2).rotated(by: newArrowRotation)))
 
     CATransaction.commit()
